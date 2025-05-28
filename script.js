@@ -1,102 +1,237 @@
-// Highlight current class based on time
-    function highlightCurrentClass() {
-      // Remove any existing highlights
-      document.querySelectorAll('tr').forEach(row => {
-        row.classList.remove('current-class');
-      });
-      
-      const now = new Date();
-      const currentHour = now.getHours();
-      const currentMinute = now.getMinutes();
-      const currentDay = now.getDay(); // 0=Sunday, 1=Monday, etc.
-      
-      // Only highlight if viewing today's timetable
-      const activeTab = document.querySelector('.tab.active');
-      if (!activeTab) return;
-      
-      const activeDay = activeTab.textContent.toLowerCase().trim();
-      const dayMap = {monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6};
-      
-      if (dayMap[activeDay] === currentDay) {
-        const rows = document.querySelectorAll('.tab-content.active tbody tr');
+// variables
+const generalBtn = document.getElementById("genral");
+const businessBtn = document.getElementById("business");
+const sportsBtn = document.getElementById("sport");
+const entertainmentBtn = document.getElementById("entertainment");
+const technologyBtn = document.getElementById("technology");
+const searchBtn = document.getElementById("searchBtn");
+
+const newsQuery = document.getElementById("newsQuery");
+const newsType = document.getElementById("newsType");
+const newsdetails = document.getElementById("newsdetails");
+
+// Array
+var newsDataArr = [];
+
+// apis 
+const API_KEY = "YOUR_API_KEY";
+const HEADLINES_NEWS = "https://newsapi.org/v2/top-headlines?country=in&apiKey=";
+const GENERAL_NEWS = "https://newsapi.org/v2/top-headlines?country=in&category=general&apiKey=";
+const BUSINESS_NEWS = "https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=";
+const SPORTS_NEWS = "https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=";
+const ENTERTAINMENT_NEWS = "https://newsapi.org/v2/top-headlines?country=in&category=entertainment&apiKey=";
+const TECHNOLOGY_NEWS = "https://newsapi.org/v2/top-headlines?country=in&category=technology&pageSize=8&apiKey=";
+const SEARCH_NEWS = "https://newsapi.org/v2/everything?q=";
+
+window.onload = function() {
+    newsType.innerHTML="<h4>Headlines</h4>";
+    fetchHeadlines();
+};
+
+
+generalBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>General news</h4>";
+    fetchGeneralNews();
+});
+
+businessBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>Business</h4>";
+    fetchBusinessNews();
+});
+
+sportsBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>Sports</h4>";
+    fetchSportsNews();
+});
+
+entertainmentBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>Entertainment</h4>";
+    fetchEntertainmentNews();
+});
+
+technologyBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>Technology</h4>";
+    fetchTechnologyNews();
+});
+
+searchBtn.addEventListener("click",function(){
+    newsType.innerHTML="<h4>Search : "+newsQuery.value+"</h4>";
+    fetchQueryNews();
+});
+
+const fetchHeadlines = async () => {
+    const response = await fetch(HEADLINES_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+
+const fetchGeneralNews = async () => {
+    const response = await fetch(GENERAL_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+const fetchBusinessNews = async () => {
+    const response = await fetch(BUSINESS_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+const fetchEntertainmentNews = async () => {
+    const response = await fetch(ENTERTAINMENT_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        console.log(myJson);
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+const fetchSportsNews = async () => {
+    const response = await fetch(SPORTS_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+const fetchTechnologyNews = async () => {
+    const response = await fetch(TECHNOLOGY_NEWS+API_KEY);
+    newsDataArr = [];
+    if(response.status >=200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        // handle errors
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+const fetchQueryNews = async () => {
+
+    if(newsQuery.value == null)
+        return;
+
+    const response = await fetch(SEARCH_NEWS+encodeURIComponent(newsQuery.value)+"&apiKey="+API_KEY);
+    newsDataArr = [];
+    if(response.status >= 200 && response.status < 300) {
+        const myJson = await response.json();
+        newsDataArr = myJson.articles;
+    } else {
+        //error handle
+        console.log(response.status, response.statusText);
+        newsdetails.innerHTML = "<h5>No data found.</h5>"
+        return;
+    }
+
+    displayNews();
+}
+
+function displayNews() {
+
+    newsdetails.innerHTML = "";
+
+    // if(newsDataArr.length == 0) {
+    //     newsdetails.innerHTML = "<h5>No data found.</h5>"
+    //     return;
+    // }
+
+    newsDataArr.forEach(news => {
+
+        var date = news.publishedAt.split("T");
         
-        rows.forEach(row => {
-          const timeCell = row.cells[0];
-          if (timeCell.textContent.includes('-')) {
-            const [startTime, endTime] = timeCell.textContent.split('-').map(t => t.trim());
-            const [startHour, startMinute] = startTime.split(':').map(Number);
-            const [endHour, endMinute] = endTime.split(':').map(Number);
-            
-            const currentTotalMinutes = currentHour * 60 + currentMinute;
-            const startTotalMinutes = startHour * 60 + startMinute;
-            const endTotalMinutes = endHour * 60 + endMinute;
-            
-            if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes <= endTotalMinutes) {
-              row.classList.add('current-class');
-            }
-          }
-        });
-      }
-    }
-    
- // Update current time display
-    function updateCurrentTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const activeTab = document.querySelector('.tab.active');
-      
-      if (activeTab) {
-        const activeDay = activeTab.textContent.toLowerCase().trim();
-        const timeElement = document.getElementById(`${activeDay}-time`);
-        if (timeElement) {
-          timeElement.textContent = `Current Time: ${timeString}`;
-        }
-      }
-    }
-    
-    // Show selected day's content
-    function showDay(day) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      // Remove active class from all tabs
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Show selected day's content
-      document.getElementById(day).classList.add('active');
-      
-      // Add active class to clicked tab
-      event.currentTarget.classList.add('active');
-      
-      // Update current class highlighting
-      highlightCurrentClass();
-      updateCurrentTime();
-    }
-    
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Auto-select today's tab
-      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-      const today = new Date().getDay();
-      if (today >= 1 && today <= 6) { // Monday to Saturday
-        const todayTab = document.querySelector(`.tab:nth-child(${today})`);
-        if (todayTab) {
-          todayTab.click();
-        }
-      }
-      
-      // Initial updates
-      updateCurrentTime();
-      highlightCurrentClass();
-      
-      // Set up periodic updates
-      setInterval(() => {
-        updateCurrentTime();
-        highlightCurrentClass();
-      }, 60000); // Update every minute
+        var col = document.createElement('div');
+        col.className="col-sm-12 col-md-4 col-lg-3 p-2 card";
+
+        var card = document.createElement('div');
+        card.className = "p-2";
+
+        var image = document.createElement('img');
+        image.setAttribute("height","matchparent");
+        image.setAttribute("width","100%");
+        image.src=news.urlToImage;
+
+        var cardBody = document.createElement('div');
+        
+        var newsHeading = document.createElement('h5');
+        newsHeading.className = "card-title";
+        newsHeading.innerHTML = news.title;
+
+        var dateHeading = document.createElement('h6');
+        dateHeading.className = "text-primary";
+        dateHeading.innerHTML = date[0];
+
+        var discription = document.createElement('p');
+        discription.className="text-muted";
+        discription.innerHTML = news.description;
+
+        var link = document.createElement('a');
+        link.className="btn btn-dark";
+        link.setAttribute("target", "_blank");
+        link.href = news.url;
+        link.innerHTML="Read more";
+
+        cardBody.appendChild(newsHeading);
+        cardBody.appendChild(dateHeading);
+        cardBody.appendChild(discription);
+        cardBody.appendChild(link);
+
+        card.appendChild(image);
+        card.appendChild(cardBody);
+
+        col.appendChild(card);
+
+        newsdetails.appendChild(col);
     });
-  
+
+}
